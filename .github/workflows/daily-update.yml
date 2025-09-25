@@ -1,0 +1,87 @@
+name: Daily README Update
+
+on:
+  schedule:
+    # UTC 12:00'de her gün çalışır (Türkiye saati ile 15:00)
+    - cron: '0 12 * * *'
+  
+  # Manuel tetikleme için (test amaçlı)
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+    
+    - name: Set up Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action Bot"
+    
+    - name: Update README
+      run: |
+        # Tarih ve saat bilgisini al (UTC+0)
+        CURRENT_DATE=$(TZ=UTC date '+%Y-%m-%d')
+        CURRENT_TIME=$(TZ=UTC date '+%H:%M:%S')
+        CURRENT_DATETIME=$(TZ=UTC date '+%Y-%m-%d %H:%M:%S UTC')
+        TIMESTAMP=$(TZ=UTC date '+%s')
+        
+        # README.md dosyasını oluştur
+        echo "# 🤖 Otomatik Güncellenen Repository" > README.md
+        echo "" >> README.md
+        echo "Bu repository her gün UTC 12:00'de otomatik olarak güncellenir." >> README.md
+        echo "" >> README.md
+        echo "## 📅 Son Güncelleme" >> README.md
+        echo "" >> README.md
+        echo "**Tarih:** \`$CURRENT_DATE\`  " >> README.md
+        echo "**Saat:** \`$CURRENT_TIME\`  " >> README.md
+        echo "**Tam Zaman:** \`$CURRENT_DATETIME\`" >> README.md
+        echo "" >> README.md
+        echo "---" >> README.md
+        echo "" >> README.md
+        echo "### 🔄 Güncelleme Geçmişi" >> README.md
+        echo "" >> README.md
+        echo "Son güncelleme GitHub Actions tarafından otomatik olarak gerçekleştirildi." >> README.md
+        echo "" >> README.md
+        echo "### ⚙️ Nasıl Çalışır?" >> README.md
+        echo "" >> README.md
+        echo "Bu repository GitHub Actions kullanarak her gün belirlenen saatte:" >> README.md
+        echo "1. README.md dosyasını günceller" >> README.md
+        echo "2. Yeni tarih ve saat bilgisini ekler" >> README.md
+        echo "3. Değişiklikleri otomatik olarak commit eder ve push yapar" >> README.md
+        echo "" >> README.md
+        echo "### 📝 Notlar" >> README.md
+        echo "" >> README.md
+        echo "- **Güncelleme zamanı:** Her gün UTC 12:00" >> README.md
+        echo "- **Timezone:** UTC+0" >> README.md
+        echo "- **Bot:** GitHub Action Bot" >> README.md
+        echo "- **Repository Sahibi:** @yusufyorunc" >> README.md
+        echo "" >> README.md
+        echo "### 📊 İstatistikler" >> README.md
+        echo "" >> README.md
+        echo "- **Unix Timestamp:** \`$TIMESTAMP\`" >> README.md
+        echo "- **Workflow:** \`.github/workflows/daily-update.yml\`" >> README.md
+        echo "" >> README.md
+        echo "---" >> README.md
+        echo "" >> README.md
+        echo "*Bu dosya otomatik olarak güncellenmiştir.*" >> README.md
+        echo "" >> README.md
+        echo "<!-- Last update: $CURRENT_DATETIME -->" >> README.md
+    
+    - name: Commit and push changes
+      run: |
+        # Değişiklik olup olmadığını kontrol et
+        if [[ -n $(git status -s) ]]; then
+          git add README.md
+          COMMIT_MESSAGE="🤖 Otomatik güncelleme: $(TZ=UTC date '+%Y-%m-%d %H:%M:%S UTC')"
+          git commit -m "$COMMIT_MESSAGE"
+          git push
+          echo "✅ README başarıyla güncellendi!"
+        else
+          echo "ℹ️ Değişiklik yok, güncelleme atlandı."
+        fi
