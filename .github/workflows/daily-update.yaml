@@ -1,0 +1,93 @@
+name: Daily README Update
+
+on:
+  schedule:
+    # UTC 12:00'de her gün çalışır (Türkiye saati ile 15:00)
+    - cron: '0 12 * * *'
+  
+  # Manuel tetikleme için (test amaçlı)
+  workflow_dispatch:
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.PAT_TOKEN }}
+    
+    - name: Set up Git
+      run: |
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action Bot"
+    
+    - name: Update README
+      run: |
+        # Mevcut README'yi yedekle
+        if [ -f README.md ]; then
+          cp README.md README.backup.md
+        fi
+        
+        # Tarih ve saat bilgisini al (UTC+0)
+        CURRENT_DATE=$(TZ=UTC date '+%Y-%m-%d')
+        CURRENT_TIME=$(TZ=UTC date '+%H:%M:%S')
+        CURRENT_DATETIME=$(TZ=UTC date '+%Y-%m-%d %H:%M:%S UTC')
+        
+        # README dosyasını oluştur veya güncelle
+        cat > README.md << 'EOF'
+# 🤖 Otomatik Güncellenen Repository
+
+Bu repository her gün UTC 12:00'de otomatik olarak güncellenir.
+
+## 📅 Son Güncelleme
+
+**Tarih:** `DATE_PLACEHOLDER`  
+**Saat:** `TIME_PLACEHOLDER`  
+**Tam Zaman:** `DATETIME_PLACEHOLDER`
+
+---
+
+### 🔄 Güncelleme Geçmişi
+
+Son güncelleme GitHub Actions tarafından otomatik olarak gerçekleştirildi.
+
+### ⚙️ Nasıl Çalışır?
+
+Bu repository GitHub Actions kullanarak her gün belirlenen saatte:
+1. README.md dosyasını günceller
+2. Yeni tarih ve saat bilgisini ekler
+3. Değişiklikleri otomatik olarak commit eder ve push yapar
+
+### 📝 Notlar
+
+- Güncelleme zamanı: Her gün UTC 12:00
+- Timezone: UTC+0
+- Bot: GitHub Action Bot
+
+---
+
+*Bu dosya otomatik olarak güncellenmiştir.*
+EOF
+        
+        # Placeholder'ları gerçek değerlerle değiştir
+        sed -i "s/DATE_PLACEHOLDER/$CURRENT_DATE/g" README.md
+        sed -i "s/TIME_PLACEHOLDER/$CURRENT_TIME/g" README.md
+        sed -i "s/DATETIME_PLACEHOLDER/$CURRENT_DATETIME/g" README.md
+        
+        # Güncelleme logunu ekle (opsiyonel)
+        echo "" >> README.md
+        echo "<!-- Last update: $CURRENT_DATETIME -->" >> README.md
+    
+    - name: Commit and push changes
+      run: |
+        # Değişiklik olup olmadığını kontrol et
+        if [[ -n $(git status -s) ]]; then
+          git add README.md
+          git commit -m "🤖 Otomatik güncelleme: $(TZ=UTC date '+%Y-%m-%d %H:%M:%S UTC')"
+          git push
+          echo "✅ README başarıyla güncellendi!"
+        else
+          echo "ℹ️ Değişiklik yok, güncelleme atlandı."
+        fi
