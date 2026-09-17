@@ -4,9 +4,9 @@ Bu repository her gün UTC 12:00'de otomatik olarak güncellenir.
 
 ## 📅 Son Güncelleme
 
-**Tarih:** `2026-09-16`  
-**Saat:** `15:56:30`  
-**Tam Zaman:** `2026-09-16 15:56:30 UTC`
+**Tarih:** `2026-09-17`  
+**Saat:** `16:03:02`  
+**Tam Zaman:** `2026-09-17 16:03:02 UTC`
 
 ---
 
@@ -30,11 +30,11 @@ Bu repository GitHub Actions kullanarak her gün belirlenen saatte:
 
 ### 📊 İstatistikler
 
-- **Unix Timestamp:** `1789574190`
+- **Unix Timestamp:** `1789660982`
 - **Workflow:** `.github/workflows/daily-update.yml`
 
 ---
 
 *Bu dosya otomatik olarak güncellenmiştir.*
 
-<!-- Last update: 2026-09-16 15:56:30 UTC -->
+<!-- Last update: 2026-09-17 16:03:02 UTC -->
